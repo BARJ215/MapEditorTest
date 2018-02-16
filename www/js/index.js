@@ -1,5 +1,5 @@
 //var map;
-var currentCenter={lat: 0, lng: 0};
+var currentCenter={lat: 52.1936, lng: 2.2216};
 
 //when the jQuery Mobile page is initialised
 $(document).on('pageinit', function() {
@@ -66,8 +66,7 @@ function updateCenter(position){
     //Update Current Center
 	currentCenter.lat=position.coords.latitude;
     currentCenter.lng=position.coords.longitude;
-    map.center=currentCenter;
-    console.log("centered");
+    initMap();
 }
 
 //called if the position is not obtained correctly
