@@ -3,10 +3,11 @@ var currentCenter={lat: 0, lng: 0};
 
 //when the jQuery Mobile page is initialised
 $(document).on('pageinit', function() {
-	
+    
 	//set up listener for button click
 	//$(document).on('click', getPosition);
-	
+	centerMap();
+    
 	//change time box to show message
 	$('#time').val("Press the button to get location data");
     
@@ -24,7 +25,7 @@ $(document).on('pageinit', function() {
 function addMarker(){
     var marker = new google.maps.Marker({
           map: map,
-          position: place.geometry.location
+          position: currentCenter;
     });
     
     console.log("added marker");
@@ -51,8 +52,6 @@ function updateTable(position) {
 	
 	//You can find out more details about what the position obejct contains here:
 	// http://www.w3schools.com/html/html5_geolocation.asp
-	
-    
 
 	//lets get some stuff out of the position object
 	var latitude = position.coords.latitude;
@@ -67,6 +66,8 @@ function updateCenter(position){
     //Update Current Center
 	currentCenter.lat=position.coords.latitude;
     currentCenter.lng=position.coords.longitude;
+    map.center=currentCenter;
+    console.log("centered");
 }
 
 //called if the position is not obtained correctly
@@ -77,7 +78,6 @@ function failPosition(error) {
 }
 
 function initMap(){
-    centerMap();
     detectBrowser();
      map = new google.maps.Map(document.getElementById('map'), {
         center: currentCenter,
