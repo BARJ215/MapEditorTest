@@ -23,12 +23,7 @@ $(document).on('pageinit', function() {
 
 
 function addMarker(){
-    var marker = new google.maps.Marker({
-          map: map,
-          position: currentCenter;
-    });
-    
-    console.log("added marker");
+    console.log("add marker");
 }
 
 //Call this function when you want to get the current position
