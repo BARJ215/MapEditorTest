@@ -1,12 +1,11 @@
 //var map;
-var currentCenter={lat: -34.397, lng: 150.644};
+var currentCenter={lat: 0, lng: 0};
 
 //when the jQuery Mobile page is initialised
 $(document).on('pageinit', function() {
 	
 	//set up listener for button click
 	//$(document).on('click', getPosition);
-    centerMap();
 	
 	//change time box to show message
 	$('#time').val("Press the button to get location data");
@@ -21,6 +20,15 @@ $(document).on('pageinit', function() {
 	
 });
 
+
+function addMarker(){
+    var marker = new google.maps.Marker({
+          map: map,
+          position: place.geometry.location
+    });
+    
+    console.log("added marker");
+}
 
 //Call this function when you want to get the current position
 function getPosition() {
@@ -44,21 +52,21 @@ function updateTable(position) {
 	//You can find out more details about what the position obejct contains here:
 	// http://www.w3schools.com/html/html5_geolocation.asp
 	
+    
 
 	//lets get some stuff out of the position object
 	var latitude = position.coords.latitude;
     var longitude = position.coords.longitude;
     
 	//OK. Now we want to update the display with the correct values
-	$('#lattext').val(latitude);
-    $('#longtext').val(longitude);
+	$('#m1lattext').val(latitude);
+    $('#m1longtext').val(longitude);
 }
 
 function updateCenter(position){
     //Update Current Center
 	currentCenter.lat=position.coords.latitude;
     currentCenter.lng=position.coords.longitude;
-    initMap();
 }
 
 //called if the position is not obtained correctly
@@ -69,29 +77,12 @@ function failPosition(error) {
 }
 
 function initMap(){
+    centerMap();
     detectBrowser();
      map = new google.maps.Map(document.getElementById('map'), {
         center: currentCenter,
         zoom: 8
     });
-    var drawingManager = new google.maps.drawing.DrawingManager({
-          drawingMode: google.maps.drawing.OverlayType.MARKER,
-          drawingControl: true,
-          drawingControlOptions: {
-            position: google.maps.ControlPosition.TOP_CENTER,
-            drawingModes: ['marker', 'circle', 'polygon', 'polyline', 'rectangle']
-          },
-          markerOptions: {icon: 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png'},
-          circleOptions: {
-            fillColor: '#ffff00',
-            fillOpacity: 1,
-            strokeWeight: 5,
-            clickable: false,
-            editable: true,
-            zIndex: 1
-          }
-        });
-        drawingManager.setMap(map);
 }
 
 function detectBrowser() {
