@@ -26,7 +26,7 @@ $(document).on('pageinit', function() {
 function getPosition() {
 	
 	//change time box to show updated message
-	$('#time').val("Getting data...");
+	$('#m1longtext').val("Getting data...");
 	
 	//instruct location service to get position with appropriate callbacks
 	navigator.geolocation.getCurrentPosition(updateTable, failPosition);
@@ -46,28 +46,12 @@ function updateTable(position) {
 	
 
 	//lets get some stuff out of the position object
-	var unixTime = new Date(position.timestamp);
-    var date = unixTime.toDateString();
 	var latitude = position.coords.latitude;
     var longitude = position.coords.longitude;
-    var acc = position.coords.accuracy;
-    var alt = position.coords.altitude;
-    var altAcc = position.coords.altitudeAccuracy;
-    var head = position.coords.heading;
-    var speed = position.coords.speed;
     
-    
-	
 	//OK. Now we want to update the display with the correct values
-	$('#time').val(date);
 	$('#lattext').val(latitude);
     $('#longtext').val(longitude);
-    $('#accText').val(acc);
-    $('#altText').val(alt);
-    $('#altAccText').val(altAcc);
-    $('#headText').val(head);
-    $('#speed').val(speed);
-
 }
 
 function updateCenter(position){
@@ -80,7 +64,7 @@ function updateCenter(position){
 //called if the position is not obtained correctly
 function failPosition(error) {
 	//change time box to show updated message
-	$('#time').val("Error getting data: " + error);
+	$('#m1longtext').val("Error getting data: " + error);
 	
 }
 
@@ -90,6 +74,24 @@ function initMap(){
         center: currentCenter,
         zoom: 8
     });
+    var drawingManager = new google.maps.drawing.DrawingManager({
+          drawingMode: google.maps.drawing.OverlayType.MARKER,
+          drawingControl: true,
+          drawingControlOptions: {
+            position: google.maps.ControlPosition.TOP_CENTER,
+            drawingModes: ['marker', 'circle', 'polygon', 'polyline', 'rectangle']
+          },
+          markerOptions: {icon: 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png'},
+          circleOptions: {
+            fillColor: '#ffff00',
+            fillOpacity: 1,
+            strokeWeight: 5,
+            clickable: false,
+            editable: true,
+            zIndex: 1
+          }
+        });
+        drawingManager.setMap(map);
 }
 
 function detectBrowser() {

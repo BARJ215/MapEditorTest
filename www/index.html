@@ -26,29 +26,20 @@
 
   <div data-role="content">
     <div data-role="fieldcontain">
-		<button id="getLocationButton">Get Location</button>
-      	<label for="longtext">Longitude:</label>
-      	<input type="text" name="longtext" id="longtext" value=""  />
-      	<label for="lattext">Latitude:</label>
-      	<input type="text" name="lattext" id="lattext" value=""  />
-      	<label for="time">Time:</label>
-      	<input type="text" name="time" id="time" value=""  />
-        <label for="accText">Accuracy:</label>
-      	<input type="text" name="accText" id="accText" value=""  />
-        <label for="altText">Altitude:</label>
-      	<input type="text" name="altText" id="altText" value=""  />
-        <label for="altAccText">Altitude Accuracy:</label>
-      	<input type="text" name="altAccText" id="altAccText" value=""  />
-        <label for="headText">Headings:</label>
-      	<input type="text" name="headText" id="headText" value=""  />
-        <label for="speed">Speed:</label>
-      	<input type="text" name="speed" id="speed" value=""  />
+        <button id="getLocationButton" onclick="getPosition()">Get Location</button>
+        <label for="longtext">Marker 1 Longitude:</label>
+      	<input type="text" name="m1longtext" id="m1longtext" value=""  />
+        <label for="lattext">Marker 1 Latitude:</label>
+      	<input type="text" name="m1lattext" id="m1lattext" value=""  />
+        <label for="longtext">Marker 2 Longitude:</label>
+      	<input type="text" name="m2longtext" id="m2longtext" value=""  />
+        <label for="lattext">Marker 2 Latitude:</label>
+      	<input type="text" name="m2lattext" id="m2lattext" value=""  />
     </div>
   </div>
 
 </div>
 
 
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAPIpoKTJCeTlhJyWooKfnRLCj24hps3I&callback=initMap"async defer></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAPIpoKTJCeTlhJyWooKfnRLCj24hps3I&libraries=drawing&callback=initMap"async defer></script>
 </body>
-</html>
