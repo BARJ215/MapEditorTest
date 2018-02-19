@@ -1,12 +1,11 @@
-//var map;
-var currentCenter={lat: 52.1936, lng: 2.2216};
-
+var map;
+var currentPos={lat: 52.1936, lng: 2.2216};
+var markers= [];
 //when the jQuery Mobile page is initialised
 $(document).on('pageinit', function() {
     
 	//set up listener for button click
-	//$(document).on('click', getPosition);
-	centerMap();
+	
     
 	//change time box to show message
 	$('#time').val("Press the button to get location data");
@@ -17,13 +16,30 @@ $(document).on('pageinit', function() {
         //enableHighAccuracy: true
     };
 
-    navigator.geolocation.watchPosition(updateTable,failPosition,locationOptions);
-	
+    //navigator.geolocation.watchPosition(updatePosition,failPosition,locationOptions);
+    //centerMap();
 });
 
+function addCheck(){
+    var center = map.getCenter();
+    addMarker(center);
+}
 
-function addMarker(){
+
+function addMarker(location){
+    var marker = new google.maps.Marker({
+        position: location,
+        map: map
+    });
+    markers.push(marker);
     console.log("add marker");
+}
+
+function deleteMarkers(){
+    for (var i = 0; i < markers.length; i++) {
+          markers[i].setMap(map);
+    }
+    markers=[];
 }
 
 //Call this function when you want to get the current position
@@ -33,17 +49,12 @@ function getPosition() {
 	$('#m1longtext').val("Getting data...");
 	
 	//instruct location service to get position with appropriate callbacks
-	navigator.geolocation.getCurrentPosition(updateTable, failPosition);
-}
-
-function centerMap(){
-    //instruct location service to get position with appropriate callbacks
-	navigator.geolocation.getCurrentPosition(updateCenter, failPosition);
+	navigator.geolocation.getCurrentPosition(updatePosition, failPosition);
 }
 
 
 //called when the position is successfully determined
-function updateTable(position) {
+function updatePosition(position) {
 	
 	//You can find out more details about what the position obejct contains here:
 	// http://www.w3schools.com/html/html5_geolocation.asp
@@ -55,33 +66,41 @@ function updateTable(position) {
 	//OK. Now we want to update the display with the correct values
 	$('#m1lattext').val(latitude);
     $('#m1longtext').val(longitude);
-}
+    
+    //Update current position
+    currentPos.lat= latitude;
+    currentPos.lng=longitude;
 
-function updateCenter(position){
-    //Update Current Center
-	currentCenter.lat=position.coords.latitude;
-    currentCenter.lng=position.coords.longitude;
-    initMap();
 }
 
 //called if the position is not obtained correctly
 function failPosition(error) {
-	//change time box to show updated message
+	//change time box to show updated messageuklkh/lkhjlkhjlkh lkhlkhlkhlkhlk
 	$('#m1longtext').val("Error getting data: " + error);
 	
 }
 
 function initMap(){
+    getPosition();
     detectBrowser();
      map = new google.maps.Map(document.getElementById('map'), {
-        center: currentCenter,
+        center: currentPos,
         zoom: 8
     });
+    
 }
+
+function centerMap(){
+    console.log("center map");
+    //instruct location service to get position with appropriate callbacks
+	getPosition();
+    //map.panTo(currentPos);
+}
+
 
 function detectBrowser() {
     var useragent = navigator.userAgent;
     var mapdiv = document.getElementById("map");
-    mapdiv.style.width = '600px';
-    mapdiv.style.height = '800px';
+    mapdiv.style.width = '300px';
+    mapdiv.style.height = '300px';
 }
