@@ -118,6 +118,6 @@ function centerMap(){
 function detectBrowser() {
     var useragent = navigator.userAgent;
     var mapdiv = document.getElementById("map");
-    mapdiv.style.width = '300px';
-    mapdiv.style.height = '300px';
+    mapdiv.style.width = '100%';
+    mapdiv.style.height = '500px';
 }
