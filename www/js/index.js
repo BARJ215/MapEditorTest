@@ -76,10 +76,17 @@ function updatePosition(position) {
 }
 
 function centerPosition(position){
-    //Update current position
-    currentPos.lat= position.coords.latitude;
-    currentPos.lng=position.coords.longitude;
+	//lets get some stuff out of the position object
+	var latitude = position.coords.latitude;
+    var longitude = position.coords.longitude;
     
+	//OK. Now we want to update the display with the correct values
+	$('#m1lattext').val(latitude);
+    $('#m1longtext').val(longitude);
+    
+    //Update current position
+    currentPos.lat= latitude;
+    currentPos.lng=longitude;
     //Load map
     initMap();
     
