@@ -17,7 +17,9 @@ $(document).on('pageinit', function() {
     };
 
     //navigator.geolocation.watchPosition(updatePosition,failPosition,locationOptions);
-    //centerMap();
+    //getPosition();
+    //initMap();
+    centerMap();
 });
 
 function addCheck(){
@@ -73,6 +75,16 @@ function updatePosition(position) {
 
 }
 
+function centerPosition(position){
+    //Update current position
+    currentPos.lat= position.coords.latitude;
+    currentPos.lng=position.coords.longitude;
+    
+    //Load map
+    initMap();
+    
+}
+
 //called if the position is not obtained correctly
 function failPosition(error) {
 	//change time box to show updated messageuklkh/lkhjlkhjlkh lkhlkhlkhlkhlk
@@ -81,7 +93,6 @@ function failPosition(error) {
 }
 
 function initMap(){
-    getPosition();
     detectBrowser();
      map = new google.maps.Map(document.getElementById('map'), {
         center: currentPos,
@@ -93,8 +104,7 @@ function initMap(){
 function centerMap(){
     console.log("center map");
     //instruct location service to get position with appropriate callbacks
-	getPosition();
-    //map.panTo(currentPos);
+    navigator.geolocation.getCurrentPosition(centerPosition, failPosition);
 }
 
 
