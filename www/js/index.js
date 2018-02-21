@@ -1,6 +1,11 @@
 var map;
 var currentPos={lat: 52.1936, lng: 2.2216};
 var markers= [];
+var labels = '123456789';
+var labelIndex = 0;
+var directionsDisplay;
+var directionsService;
+
 //when the jQuery Mobile page is initialised
 $(document).on('pageinit', function() {
     
@@ -17,8 +22,8 @@ $(document).on('pageinit', function() {
     };
 
     //navigator.geolocation.watchPosition(updatePosition,failPosition,locationOptions);
-    //getPosition();
-    //initMap();
+    //navigator.geolocation.getCurrentPosition(updatePosition, failPosition);
+    //Center Map
     centerMap();
 });
 
@@ -27,13 +32,16 @@ function addCheck(){
     addMarker(center);
 }
 
-
 function addMarker(location){
     var marker = new google.maps.Marker({
         position: location,
-        map: map
+        map: map,
+        label: labels[labelIndex++ % labels.length],
+        draggable: true,
+        
     });
     markers.push(marker);
+
     console.log("add marker");
 }
 
@@ -42,54 +50,33 @@ function deleteMarkers(){
           markers[i].setMap(map);
     }
     markers=[];
+    labelIndex=0;
 }
 
-//Call this function when you want to get the current position
-function getPosition() {
-	
-	//change time box to show updated message
-	$('#m1longtext').val("Getting data...");
-	
-	//instruct location service to get position with appropriate callbacks
-	navigator.geolocation.getCurrentPosition(updatePosition, failPosition);
-}
-
-
-//called when the position is successfully determined
-function updatePosition(position) {
-	
-	//You can find out more details about what the position obejct contains here:
-	// http://www.w3schools.com/html/html5_geolocation.asp
-
-	//lets get some stuff out of the position object
-	var latitude = position.coords.latitude;
-    var longitude = position.coords.longitude;
-    
-	//OK. Now we want to update the display with the correct values
-	$('#m1lattext').val(latitude);
-    $('#m1longtext').val(longitude);
-    
-    //Update current position
-    currentPos.lat= latitude;
-    currentPos.lng=longitude;
-
+function centerMap(){
+    console.log("center map");
+    //instruct location service to get position with appropriate callbacks
+    navigator.geolocation.getCurrentPosition(centerPosition, failPosition);
 }
 
 function centerPosition(position){
+    //Get position
+    getPosition(position);
+    //Load map
+    initMap();
+    //Add Start Finish Markers
+    startFinishMarkers();
+}
+
+//called when the position is successfully determined
+function getPosition(position) {
 	//lets get some stuff out of the position object
 	var latitude = position.coords.latitude;
     var longitude = position.coords.longitude;
     
-	//OK. Now we want to update the display with the correct values
-	$('#m1lattext').val(latitude);
-    $('#m1longtext').val(longitude);
-    
     //Update current position
     currentPos.lat= latitude;
     currentPos.lng=longitude;
-    //Load map
-    initMap();
-    
 }
 
 //called if the position is not obtained correctly
@@ -101,23 +88,81 @@ function failPosition(error) {
 
 function initMap(){
     detectBrowser();
+    directionsDisplay = new google.maps.DirectionsRenderer;
+    directionsService = new google.maps.DirectionsService;
      map = new google.maps.Map(document.getElementById('map'), {
         center: currentPos,
-        zoom: 8
+        zoom: 15
     });
+    directionsDisplay.setMap(map);
     
 }
 
-function centerMap(){
-    console.log("center map");
-    //instruct location service to get position with appropriate callbacks
-    navigator.geolocation.getCurrentPosition(centerPosition, failPosition);
-}
+function startFinishMarkers(){
+    
+    //Start Marker
+    var start = new google.maps.Marker({
+        position: {lat: currentPos.lat,lng: currentPos.lng-0.003},
+        map: map,
+        label:{
+            text:'START',
+            fontWeight: '900'
+        },
+        animation: google.maps.Animation.DROP,
+        draggable: true
+    });
 
+    
+    //Finish Marker
+    var finish = new google.maps.Marker({
+        position: {lat: currentPos.lat,lng: currentPos.lng+0.003},
+        map: map,
+        label:{
+            text:'FINISH',
+            fontWeight: '900',
+        },
+        animation: google.maps.Animation.DROP,
+        draggable: true
+    });
+    
+    //Add markers
+    markers.push(start);
+    markers.push(finish);
+}
 
 function detectBrowser() {
     var useragent = navigator.userAgent;
     var mapdiv = document.getElementById("map");
     mapdiv.style.width = '100%';
     mapdiv.style.height = '500px';
+}
+
+function save(){
+;
+    var start = markers[0].getPosition();
+    var fin = markers[1].getPosition();
+    
+    $('#slongtext').val(start.lng());
+    $('#slattext').val(start.lat());
+    $('#flongtext').val(fin.lng());
+    $('#flattext').val(fin.lat());
+    
+    calcRoute(directionsService,directionsDisplay,start,fin);
+}
+
+function calcRoute(directionsService, directionsDisplay,s,f) {
+        directionsService.route({
+          origin: s,  // Haight.
+          destination: f,  // Ocean Beach.
+          // Note that Javascript allows us to access the constant
+          // using square brackets and a string value as its
+          // "property."
+          travelMode: google.maps.TravelMode['WALKING']
+        }, function(response, status) {
+          if (status == 'OK') {
+            directionsDisplay.setDirections(response);
+          } else {
+            window.alert('Directions request failed due to ' + status);
+          }
+        });
 }
