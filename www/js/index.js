@@ -1,12 +1,11 @@
-var map;
+Backendless.initApp("1F116359-9934-2652-FF41-EC23042C0400","B59AA48F-500F-B1E8-FF7B-EACAB3399500");
 var currentPos={lat: 52.1936, lng: 2.2216};
 var markers= [];
-var labels = '123456789';
-var labelIndex = 0;
-var directionsDisplay;
-var directionsService;
 var points=[];
 
+$(document).on("click","#saveButton",saveCourse);
+$(document).on("click","#loadButton",load);
+$(document).on("click","#uploadButton",upload);
 //when the jQuery Mobile page is initialised
 $(document).on('pageinit', function() {
     
@@ -41,6 +40,7 @@ function centerPosition(position){
     getPosition(position);
     //Load map
     initMap();
+    
     //Add Start Finish Markers
     //startFinishMarkers();
     route ={
@@ -49,10 +49,11 @@ function centerPosition(position){
           // Note that Javascript allows us to access the constant
           // using square brackets and a string value as its
           // "property."
-          waypoints: markers,
           travelMode: google.maps.TravelMode['WALKING']
     };
     calcRoute(directionsService, directionsDisplay, route);
+    
+    addMarker(currentPos);
 }
 
 //called when the position is successfully determined
@@ -64,6 +65,8 @@ function getPosition(position) {
     //Update current position
     currentPos.lat= latitude;
     currentPos.lng=longitude;
+    
+    
 }
 
 //called if the position is not obtained correctly
@@ -99,38 +102,83 @@ function detectBrowser() {
 }
 
 function calcRoute(directionsService, directionsDisplay, route) {
+        //Attempt to calculate route
         directionsService.route(route, function(response, status) {
           if (status == 'OK') {
+            //If succesful, display route and save
             directionsDisplay.setDirections(response);
-            save();
+            saveCourse();
           } else {
             window.alert('Directions request failed due to ' + status);
           }
         });     
 }
 
-function save(){
-    //waypoints = (directionsDisplay.directions.geocoded_waypoints);
+function saveCourse(){
+    
+    var points=[];
     var geo = directionsDisplay.directions.geocoded_waypoints;
+    //For everpoint on the map
     for(i=0; i<geo.length;i++){
         points[i]={placeId: geo[i].place_id};
+        //If a waypoint...
         if(0<i&&i<geo.length-1){
            points[i]={location: {placeId: geo[i].place_id},stopover:false}; 
         }
     }
-    console.log(points);
-    //$('#slongtext').val(start.lng());
-    //$('#slattext').val(start.lat());
-    //$('#flongtext').val(fin.lng());
-    //$('#flattext').val(fin.lat());
     
 }
 
+function upload(){
+    var geo = directionsDisplay.directions.geocoded_waypoints;
+    var newCourse={
+        courseName: "Test",
+        origin: geo[0].place_id,
+        destination: geo[geo.length-1].place_id
+    };
+    if(geo.length>2){
+        //Save optional waypoints as single string
+        var waypoints =geo[1].place_id;
+        for(i=2;i<geo.length-1;i++){
+            //If does not exceed the limit
+            if(waypoints.length+geo[i].place_id.length+1<=500){
+               waypoints= String(waypoints+","+geo[i].place_id); 
+            }
+        }
+        newCourse.waypoints=waypoints;
+    }
+    
+    /*
+    newCourse.courseName= "Test";
+    newCourse.origin=geo[0].place_id;
+    newCourse.destination=geo[geo.length-1].place_id;
+    if(geo.length>2){
+        console.log("optional waypoints");
+        var wpoints={};
+        for(i=1;i<geo.length-1;i++){   
+            wpoints[i]={placeId: geo[i].place_id}
+        }
+        newCourse.points=wpoints;
+        
+    }
+    */
+    
+    Backendless.Data.of("courses").save(newCourse).then(saved).catch(error);
+}
+
+function saved(savedCourse){
+    console.log("uploaded " + savedCourse.objectId);
+}
+
+function error(err){
+    alert(err);   
+}
+
 function load(){
-    //initMap();
-    //route.origin=waypoints[0].place_id;
+    //Set inital point and destination
     route.origin=points[0];
     route.destination=points[points.length-1];
+    //Optional waypoints...
     if(points.length>2){
         if(points.length==3){
           route.waypoints=[points[1]];  
@@ -138,7 +186,30 @@ function load(){
           route.waypoints=points.slice(1,points.length-1);
         }
     }
-    
+    //Calculate and display using new route
     calcRoute(directionsService, directionsDisplay, route);
+}
+
+function download(objectId){
+    
+}
+function addMarker(location){
+    //Create a new marker
+    var marker = new google.maps.Marker({
+        position: location,
+        map: map,    
+    });
+    //Add marker to array
+    markers.push(marker);
+    console.log("add marker");
+}
+
+function deleteMarkers(){
+    //Remove all markers from the map
+    for (var i = 0; i < markers.length; i++) {
+          markers[i].setMap(null);
+    }
+    //Clear markers array
+    markers=[];
 }
 
